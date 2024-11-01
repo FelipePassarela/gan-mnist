@@ -1,0 +1,11 @@
+training:
+  batch_size: 128
+  epochs: 10
+  learning_rate: 3.0e-4
+  latent_dim: 128
+  seed: 42
+
+dirs:
+  data_dir: data/
+  models_dir: models/
+  logs_dir: logs/
