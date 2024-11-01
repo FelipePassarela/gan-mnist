@@ -71,7 +71,7 @@ def train_step(
         g_loss.backward()
         g_optimizer.step()
 
-        running_losses["d_loss"] += (loss_real + loss_fake).item()
+        running_losses["d_loss"] += d_loss.item()
         running_losses["g_loss"] += g_loss.item()
 
         progress_bar.set_postfix({
@@ -113,10 +113,10 @@ def test_step(
 
             loss_real = criterion(output_real, torch.ones_like(output_real, device=device))
             loss_fake = criterion(output_fake, torch.zeros_like(output_fake, device=device))
-            g_lossen = criterion(output_fake, torch.ones_like(output_fake, device=device))
+            g_loss = criterion(output_fake, torch.ones_like(output_fake, device=device))
             
             running_losses["d_loss"] += (loss_real + loss_fake).item()
-            running_losses["g_loss"] += g_lossen.item()
+            running_losses["g_loss"] += g_loss.item()
             
             if i % (n_batches // save_image_freq) == 0:
                 saved_fake_images.append(fake_images[:5].cpu())
