@@ -84,7 +84,7 @@ def load_data():
 
     train_loader = DataLoader(train_set, batch_size=train_config["batch_size"], shuffle=True)
     test_loader = DataLoader(test_set, batch_size=train_config["batch_size"], shuffle=False)
-    return train_loader,test_loader
+    return train_loader, test_loader
 
 
 def save_models(generator, discriminator):
