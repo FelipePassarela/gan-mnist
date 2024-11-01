@@ -68,22 +68,17 @@ def load_data():
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5], std=[0.5])
     ])
-    target_transform = transforms.Compose([
-        transforms.Lambda(lambda y: torch.tensor(y, dtype=torch.long))
-    ])
 
     train_set = datasets.MNIST(
         dirs_config["data_dir"], 
         train=True, 
         transform=transform, 
-        target_transform=target_transform, 
         download=True, 
     )
     test_set = datasets.MNIST(
         dirs_config["data_dir"], 
         train=False, 
         transform=transform, 
-        target_transform=target_transform, 
         download=True, 
     )
 
