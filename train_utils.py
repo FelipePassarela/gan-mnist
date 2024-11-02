@@ -89,13 +89,11 @@ def test_step(
         dataloader,
         criterion,
         device,
-        save_image_freq = 30,
 ):
     n_batches = len(dataloader)
     progress_bar = tqdm(enumerate(dataloader), desc="Testing", total=n_batches, unit="batch", colour="blue")
     
     running_losses = {"d_loss": 0, "g_loss": 0}
-    saved_fake_images = []
     
     generator.eval()
     discriminator.eval()
@@ -117,9 +115,6 @@ def test_step(
             
             running_losses["d_loss"] += (loss_real + loss_fake).item()
             running_losses["g_loss"] += g_loss.item()
-            
-            if i % (n_batches // save_image_freq) == 0:
-                saved_fake_images.append(fake_images[:5].cpu())
 
             progress_bar.set_postfix({
                 "D Loss": f"{running_losses["d_loss"] / (i + 1):.4f}",
@@ -127,4 +122,4 @@ def test_step(
             })
     
     avg_losses = {k: v / n_batches for k, v in running_losses.items()}
-    return avg_losses, saved_fake_images
+    return avg_losses
