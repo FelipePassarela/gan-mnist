@@ -1,3 +1,4 @@
+import math
 import os
 import time
 from pathlib import Path
@@ -10,6 +11,7 @@ import yaml
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import v2 as transforms
+from torchvision.utils import make_grid
 
 from gan import Discriminator, Generator
 from train_utils import set_seed, test_step, train_step
@@ -45,14 +47,14 @@ def main():
         print("-" * 30)
         
         train_losses = train_step(generator, discriminator, train_loader, optimizer_g, optimizer_d, criterion, device)
-        test_losses, generated_images = test_step(generator, discriminator, test_loader, criterion, device)
+        test_losses = test_step(generator, discriminator, test_loader, criterion, device)
 
         wandb.log({
             "train_generator_loss": train_losses["g_loss"],
             "train_discriminator_loss": train_losses["d_loss"],
             "test_generator_loss": test_losses["g_loss"],
             "test_discriminator_loss": test_losses["d_loss"],
-            "generated_images": [wandb.Image(fake_image) for fake_image in generated_images[0][0]],
+            "generated_images": [wandb.Image(generate_images_grid(device, generator))],
         })
 
         print(f"G Train Loss: {train_losses['g_loss']:.4f} - D Train Loss: {train_losses['d_loss']:.4f}")
@@ -63,9 +65,17 @@ def main():
     wandb.finish()
 
 
+def generate_images_grid(device, generator):
+    noise = torch.randn(config["n_imgs_to_gen"], train_config["latent_dim"], 1, 1, device=device)
+    generated_images = generator(noise).detach()
+    nrow = int(math.sqrt(config["n_imgs_to_gen"]))
+    return make_grid(generated_images, nrow=nrow, normalize=True)
+
+
 def load_data():
     transform = transforms.Compose([
-        transforms.ToTensor(),
+        transforms.ToImage(),
+        transforms.ToDtype(torch.float32, scale=True),
         transforms.Normalize(mean=[0.5], std=[0.5])
     ])
 
